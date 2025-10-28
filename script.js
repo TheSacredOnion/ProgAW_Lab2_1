@@ -1,38 +1,57 @@
 (function () {
-  const example = document.getElementById('example')
-  const cw1 = document.getElementById('cw1')
+  const example = document.getElementById('example');
+  const cw1 = document.getElementById('cw1');
   const postIdInput = document.getElementById('postId');
   const cw1GetButton = document.getElementById('cw1-get');
-  const cw2 = document.getElementById('cw2')
-  const cw3 = document.getElementById('cw3')
-  const answer = document.getElementById('answer')
+  const cw2 = document.getElementById('cw2');
+  const cw3 = document.getElementById('cw3');
+  const answer = document.getElementById('answer');
 
   example.addEventListener("click", function () {
     fetch('https://jsonplaceholder.typicode.com/posts')
       .then(response => response.json())
       .then(array => {
-        console.log(array)
-        answer.innerHTML = JSON.stringify(array);
-      })
-  })
+        console.log(array);
+        answer.innerHTML = `<pre>${JSON.stringify(array, null, 2)}</pre>`;
+      });
+  });
 
   cw1.addEventListener("click", function () {
-  answer.innerHTML = "Ładowanie danych...";
-  fetch("https://jsonplaceholder.typicode.com/posts")
-    .then(response => response.json())
-    .then(array => {
-      answer.innerHTML = "";
-      const ul = document.createElement("ul");
-      array.forEach(post => {
-        const li = document.createElement("li");
-        li.innerHTML = `Id = ${post.id} <br> Title = ${post.title} <br> Body = ${post.body}`;
-        ul.appendChild(li);
+    answer.innerHTML = "Ładowanie danych...";
+    fetch("https://jsonplaceholder.typicode.com/posts")
+      .then(response => response.json())
+      .then(array => {
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+
+        thead.innerHTML = `
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Body</th>
+          </tr>
+        `;
+
+        array.forEach(post => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${post.id}</td>
+            <td>${post.title}</td>
+            <td>${post.body}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        answer.innerHTML = "";
+        answer.appendChild(table);
+      })
+      .catch(error => {
+        console.error("Błąd podczas pobierania danych:", error);
+        answer.textContent = "Błąd podczas pobierania danych.";
       });
-      answer.appendChild(ul);
-    })
-    .catch(error => {
-      console.error("Błąd podczas pobierania danych:", error);
-    });
   });
 
   cw1GetButton.addEventListener("click", function () {
@@ -50,7 +69,21 @@
         return response.json();
       })
       .then(post => {
-        answer.innerHTML = `Id = ${post.id} <br> Title = ${post.title} <br> Body = ${post.body}`;
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr><th>ID</th><th>Title</th><th>Body</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${post.id}</td>
+              <td>${post.title}</td>
+              <td>${post.body}</td>
+            </tr>
+          </tbody>
+        `;
+        answer.innerHTML = "";
+        answer.appendChild(table);
       })
       .catch(error => {
         console.error("Błąd podczas pobierania danych:", error);
@@ -60,7 +93,7 @@
 
   cw2.addEventListener("click", function () {
     //TODO
-  })
+  });
 
   cw3.addEventListener("click", async function () {
     answer.innerHTML = "Ładowanie danych...";
@@ -81,6 +114,5 @@
     } catch (error) {
       answer.textContent = `Błąd podczas dodawania posta. ${error}`;
     }
-  })
-
+  });
 })();

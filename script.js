@@ -6,21 +6,35 @@
   const cw2 = document.getElementById('cw2');
   const cw3 = document.getElementById('cw3');
   const answer = document.getElementById('answer');
+  const loadingPopup = document.getElementById('loading-popup');
+
+  // === Funkcje pomocnicze ===
+  function showLoading() {
+    loadingPopup.classList.remove('hidden');
+  }
+
+  function hideLoading() {
+    loadingPopup.classList.add('hidden');
+  }
 
   example.addEventListener("click", function () {
+    showLoading();
     fetch('https://jsonplaceholder.typicode.com/posts')
       .then(response => response.json())
       .then(array => {
+        hideLoading();
         console.log(array);
         answer.innerHTML = `<pre>${JSON.stringify(array, null, 2)}</pre>`;
-      });
+      })
+      .catch(() => hideLoading());
   });
 
   cw1.addEventListener("click", function () {
-    answer.innerHTML = "Ładowanie danych...";
+    showLoading();
     fetch("https://jsonplaceholder.typicode.com/posts")
       .then(response => response.json())
       .then(array => {
+        hideLoading();
         const table = document.createElement("table");
         const thead = document.createElement("thead");
         const tbody = document.createElement("tbody");
@@ -34,7 +48,6 @@
         `;
 
         array.forEach(post => {
-          console.log(`Post ID = ${post.id}, Post Title = ${post.title}`);
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${post.id}</td>
@@ -50,6 +63,7 @@
         answer.appendChild(table);
       })
       .catch(error => {
+        hideLoading();
         console.error("Błąd podczas pobierania danych:", error);
         answer.textContent = "Błąd podczas pobierania danych.";
       });
@@ -61,7 +75,7 @@
       alert("Proszę wpisać ID posta.");
       return;
     }
-    answer.innerHTML = "Ładowanie danych...";
+    showLoading();
     fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
       .then(response => {
         if (!response.ok) {
@@ -70,6 +84,7 @@
         return response.json();
       })
       .then(post => {
+        hideLoading();
         const table = document.createElement("table");
         table.innerHTML = `
           <thead>
@@ -87,6 +102,7 @@
         answer.appendChild(table);
       })
       .catch(error => {
+        hideLoading();
         console.error("Błąd podczas pobierania danych:", error);
         answer.innerHTML = "Błąd podczas pobierania danych.";
       });
@@ -97,7 +113,7 @@
   });
 
   cw3.addEventListener("click", async function () {
-    answer.innerHTML = "Ładowanie danych...";
+    showLoading();
     try {
       const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
         method: 'POST',
@@ -111,8 +127,10 @@
 
       const data = await res.json();
       console.log(data);
+      hideLoading();
       answer.textContent = `Dodano post o ID = ${data.id}`;
     } catch (error) {
+      hideLoading();
       answer.textContent = `Błąd podczas dodawania posta. ${error}`;
     }
   });

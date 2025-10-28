@@ -34,6 +34,7 @@
         `;
 
         array.forEach(post => {
+          console.log(`Post ID = ${post.id}, Post Title = ${post.title}`);
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${post.id}</td>
